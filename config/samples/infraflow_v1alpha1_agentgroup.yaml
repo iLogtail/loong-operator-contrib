@@ -1,0 +1,20 @@
+apiVersion: infraflow.co/v1alpha1
+kind: AgentGroup
+metadata:
+  name: example-agentgroup
+  namespace: loongcollector-system
+spec:
+  # AgentGroup 的名称，必须与 ConfigServer 中的名称一致
+  name: example-group
+  # AgentGroup 的描述信息
+  description: "Example agent group for collecting logs and metrics"
+  # AgentGroup 的标签，关联到agent
+  tags:
+    - "production"
+    - "log-collection"
+    - "metrics"
+  # 要应用到该 AgentGroup 的配置列表
+  configs:
+    - "nginx-log-collection"
+    - "system-metrics"
+    - "application-logs"
