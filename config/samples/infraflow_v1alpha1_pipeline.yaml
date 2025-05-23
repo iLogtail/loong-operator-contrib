@@ -1,0 +1,20 @@
+apiVersion: infraflow.co/v1alpha1
+kind: Pipeline
+metadata:
+  labels:
+    app.kubernetes.io/name: loongcollector-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: pipeline-sample
+  namespace: loongcollector-system
+spec:
+  name: sample-pipeline
+  content: |
+    inputs:
+      - type: file
+        path: /var/log/containers/*.log
+    processors:
+      - type: json
+        fields:
+          - message
+    outputs:
+      - type: stdout
