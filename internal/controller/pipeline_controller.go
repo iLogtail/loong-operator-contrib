@@ -154,45 +154,91 @@ func (r *PipelineReconciler) shouldUpdatePipeline(ctx context.Context, pipeline 
 			return true
 		}
 
+		// 检查AgentGroup是否存在
+		groupExists := false
 		for _, group := range groups {
 			if group.Name == pipeline.Spec.AgentGroup {
 				// TODO: 这里需要检查Pipeline是否在group中的逻辑
+				groupExists = true
+				// 检查Pipeline是否已经在group中
+				for _, config := range group.Configs {
+					if config == pipeline.Spec.Name {
+						return false
+					}
+				}
 				return true
 			}
+		}
+
+		// 如果AgentGroup不存在，需要创建
+		if !groupExists {
+			return true
 		}
 	}
 
 	return false
 }
-
-// applyPipeline 应用Pipeline配置到Agent
 func (r *PipelineReconciler) applyPipeline(ctx context.Context, pipeline *v1alpha1.Pipeline) error {
 	if err := r.getConfigServerURL(ctx); err != nil {
 		return err
 	}
 
-	configServerClient := configserver.NewConfigServerClient(r.BaseURL, &r.Client, pipeline.Namespace)
+	client := configserver.NewConfigServerClient(r.BaseURL, &r.Client, pipeline.Namespace)
+
 	var lastErr error
 	for i := 0; i < maxRetries; i++ {
-		if err := configServerClient.CreateConfig(ctx, pipeline); err != nil {
+		if err := r.tryApplyPipeline(ctx, client, pipeline); err != nil {
 			lastErr = err
 			time.Sleep(retryDelay)
 			continue
-		}
-
-		// 如果指定了AgentGroup，更新AgentGroup配置
-		if pipeline.Spec.AgentGroup != "" {
-			if err := configServerClient.ApplyConfigToAgentGroup(ctx, pipeline.Spec.Name, pipeline.Spec.AgentGroup); err != nil {
-				lastErr = err
-				time.Sleep(retryDelay)
-				continue
-			}
 		}
 		return nil
 	}
 	return lastErr
 }
 
+// tryApplyPipeline 应用Pipeline重试
+func (r *PipelineReconciler) tryApplyPipeline(ctx context.Context, client *configserver.ConfigServerClient, pipeline *v1alpha1.Pipeline) error {
+	if err := client.CreateConfig(ctx, pipeline); err != nil {
+		return err
+	}
+
+	agentGroup := pipeline.Spec.AgentGroup
+	if agentGroup == "" {
+		return nil
+	}
+
+	// 获取已有AgentGroup列表
+	groups, err := client.ListAgentGroups(ctx)
+	if err != nil {
+		return err
+	}
+
+	// 判断是否存在
+	exists := false
+	for _, group := range groups {
+		if group.Name == agentGroup {
+			exists = true
+			break
+		}
+	}
+
+	// 创建AgentGroup（如果不存在）
+	if !exists {
+		newGroup := &configserver.AgentGroup{
+			Name:        agentGroup,
+			Description: "Created automatically for pipeline " + pipeline.Spec.Name,
+		}
+		if err := client.CreateAgentGroup(ctx, newGroup); err != nil {
+			return err
+		}
+	}
+
+	// 关联Pipeline到AgentGroup
+	return client.ApplyConfigToAgentGroup(ctx, pipeline.Spec.Name, agentGroup)
+}
+
+// updateStatusFailure 更新Pipeline状态为失败
 func (r *PipelineReconciler) updateStatusFailure(ctx context.Context, pipeline *v1alpha1.Pipeline, msg string, err error) (ctrl.Result, error) {
 	pipeline.Status.Success = false
 	pipeline.Status.Message = msg
@@ -204,10 +250,10 @@ func (r *PipelineReconciler) updateStatusFailure(ctx context.Context, pipeline *
 
 // getConfigServerURL gets the ConfigServer URL from ConfigMap
 func (r *PipelineReconciler) getConfigServerURL(ctx context.Context) error {
-	configMap, err := kube.GetConfigMapByLabel(ctx, r.Client, configMapName, 
+	configMap, err := kube.GetConfigMapByLabel(ctx, r.Client, configMapName,
 		configMapNamespace, map[string]string{
-		"app": "config-server",
-	})
+			"app": "config-server",
+		})
 	if err != nil {
 		return err
 	}

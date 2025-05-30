@@ -97,7 +97,7 @@ Pipeline CRD fields description:
 For more information on the Pipeline CRD fields, please refer to [Pipeline CRD documentation](docs/pipeline-fields.md)
 #### Config-Server Configuration
 
-The default Config-Server service address is `http://config-server:9090`, and the Config-Server address can also be configured through ConfigMap:
+The default Config-Server service address is `http://config-server:8899`, and the Config-Server address can also be configured through ConfigMap:
 
 ```yaml
 apiVersion: v1alpha1
@@ -108,10 +108,10 @@ metadata:
   labels:
     app: config-server
 data:
-  configServerURL: "http://config-server:9090"
+  configServerURL: "http://config-server:8899"
 ```
 > Tips:
->- The priority of operator getting Config-Server is **default address `http://config-server:9090`** -> **ConfigMap**，the way to get ConfigMap is through label, the value is `app: config-server`, currently not supported to modify
+>- The priority of operator getting Config-Server is **default address `http://config-server:8899`** -> **ConfigMap**，the way to get ConfigMap is through label, the value is `app: config-server`, currently not supported to modify
 >- If the Config-Server address changes, you need to manually update the ConfigMap and restart the operator
 >   - `kubectl rollout restart deployment -n loongcollector-system loongcollector-operator` restart operator
 

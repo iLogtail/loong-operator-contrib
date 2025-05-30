@@ -50,28 +50,18 @@ metadata:
 spec:
   name: "example-pipeline"
   content: |
-    {
-      "inputs": [
-        {
-          "type": "file",
-          "paths": ["/var/log/*.log"]
-        }
-      ],
-      "processors": [
-        {
-          "type": "json"
-        }
-      ],
-      "outputs": [
-        {
-          "type": "sls",
-          "endpoint": "cn-hangzhou.log.aliyuncs.com",
-          "project": "example-project",
-          "logstore": "example-logstore"
-        }
-      ]
-    }
-  agentGroup: "default"
+    inputs:
+      - type: file
+        paths:
+          - /var/log/*.log
+    processors:
+      - type: json
+    outputs:
+      - type: sls
+        endpoint: cn-hangzhou.log.aliyuncs.com
+        project: example-project
+        logstore: example-logstore
+  agentGroup: "example-group"
   project:
     name: "example-project"
   logStores:

@@ -96,7 +96,7 @@ Pipeline CRD 字段说明：
 更多 Pipeline CRD 字段说明请参考 [Pipeline CRD 文档](docs/pipeline-fields.md)
 #### Config-Server 配置
 
-默认情况下，Config-Server 服务地址是 `http://config-server:9090` ，也可以通过 ConfigMap 配置 Config-Server 地址：
+默认情况下，Config-Server 服务地址是 `http://config-server:8899` ，也可以通过 ConfigMap 配置 Config-Server 地址：
 
 ```yaml
 apiVersion: v1alpha1
@@ -107,10 +107,10 @@ metadata:
   labels:
     app: config-server
 data:
-  configServerURL: "http://config-server:9090"
+  configServerURL: "http://config-server:8899"
 ```
 > Tips：
->- operator获取Config-Server优先级为 **默认地址 `http://config-server:9090`** > **ConfigMap**，获取ConfigMap的方式是通过lable获取，值为`app: config-server`，暂不支持修改
+>- operator获取Config-Server优先级为 **默认地址 `http://config-server:8899`** > **ConfigMap**，获取ConfigMap的方式是通过lable获取，值为`app: config-server`，暂不支持修改
 >- 如果Config-Server地址发生变化，需要手动更新ConfigMap，并重启operator
 >   - `kubectl rollout restart deployment -n loongcollector-system loongcollector-operator` 重启operator
 

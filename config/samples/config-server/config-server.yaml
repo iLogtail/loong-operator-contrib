@@ -32,7 +32,7 @@ items:
     data:
       serverConfig.json: |
         {
-          "address": "0.0.0.0:9090",
+          "address": "0.0.0.0:8899",
           "capabilities": {
             "rememberAttribute": true,
             "rememberPipelineConfigStatus": true,
@@ -128,7 +128,7 @@ items:
             - name: config-server
               image: ghcr.io/ilogtail/config-server:latest
               ports:
-                - containerPort: 9090
+                - containerPort: 8899
               volumeMounts:
                 - name: database-config
                   mountPath: /backend/cmd/config/prod/databaseConfig.json
@@ -155,8 +155,8 @@ items:
       selector:
         app: config-server
       ports:
-        - port: 9090
-          targetPort: 9090
+        - port: 8899
+          targetPort: 8899
       type: ClusterIP
 
   - apiVersion: apps/v1
@@ -183,7 +183,7 @@ items:
             - containerPort: 8080
             env:
             - name: CONFIG_SERVER_URL
-              value: "http://config-server:9090"
+              value: "http://config-server:8899"
           imagePullSecrets:
           - name: regcred
           

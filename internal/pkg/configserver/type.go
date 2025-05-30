@@ -5,6 +5,7 @@ type AgentGroup struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
+	Configs     []string `json:"configs,omitempty"`
 }
 
 type response struct {
