@@ -1,0 +1,605 @@
+apiVersion: v1alpha1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+    control-plane: controller-manager
+  name: system
+  namespace: loongcollector-system
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.2
+  name: agentgroups.loongcollector.infraflow.co
+spec:
+  group: loongcollector.infraflow.co
+  names:
+    kind: AgentGroup
+    listKind: AgentGroupList
+    plural: agentgroups
+    singular: agentgroup
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AgentGroup is the Schema for the agentgroups API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AgentGroupSpec defines the desired state of AgentGroup.
+            properties:
+              configs:
+                description: Configs that should be applied to this agent group
+                items:
+                  type: string
+                type: array
+              description:
+                description: Description of the agent group
+                type: string
+              name:
+                description: Name of the agent group
+                type: string
+              tags:
+                description: Tags for the agent group
+                items:
+                  type: string
+                type: array
+            required:
+            - name
+            type: object
+          status:
+            description: AgentGroupStatus defines the observed state of AgentGroup.
+            properties:
+              appliedConfigs:
+                description: AppliedConfigs is the list of configs that have been
+                  applied to this agent group
+                items:
+                  type: string
+                type: array
+              lastUpdateTime:
+                description: LastUpdateTime is the last time the agent group was updated
+                format: date-time
+                type: string
+              message:
+                description: Message is the message of the agent group
+                type: string
+              success:
+                description: Success indicates whether the agent group was successfully
+                  created
+                type: boolean
+            required:
+            - success
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.2
+  name: pipelines.loongcollector.infraflow.co
+spec:
+  group: loongcollector.infraflow.co
+  names:
+    kind: Pipeline
+    listKind: PipelineList
+    plural: pipelines
+    singular: pipeline
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Pipeline is the Schema for the pipelines API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: PipelineSpec defines the desired state of Pipeline.
+            properties:
+              agentGroup:
+                description: AgentGroup specifies the agent group to which this pipeline
+                  should be applied
+                type: string
+              content:
+                description: content is the pipeline configuration
+                type: string
+              enableUpgradeOverride:
+                description: EnableUpgradeOverride indicates whether to enable upgrade
+                  override
+                type: boolean
+                x-kubernetes-preserve-unknown-fields: true
+              logStores:
+                description: LogStores defines the SLS logstore configurations
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              machineGroups:
+                description: MachineGroups defines the machine groups for log collection
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              name:
+                description: Name of the pipeline
+                type: string
+              project:
+                description: |-
+                  支持logtail
+                  https://help.aliyun.com/zh/sls/user-guide/recommend-use-aliyunpipelineconfig-to-manage-collection-configurations?spm=a2c4g.11186623.help-menu-28958.d_2_1_1_3_2_0.3b56694e44bSyR&scm=20140722.H_2833390._.OR_help-T_cn~zh-V_1#770941e164v6h
+                  Project defines the SLS project configuration
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            required:
+            - content
+            - name
+            type: object
+          status:
+            description: PipelineStatus defines the observed state of Pipeline.
+            properties:
+              LastUpdateTime:
+                description: LastUpdateTime is the last time the pipeline was updated
+                format: date-time
+                type: string
+              lastAppliedConfig:
+                description: LastAppliedConfig is the last applied configuration of
+                  the pipeline
+                properties:
+                  appliedTime:
+                    format: date-time
+                    type: string
+                  content:
+                    type: string
+                type: object
+              message:
+                description: Message is the message of the pipeline
+                type: string
+              success:
+                description: Success indicates whether the pipeline was successfully
+                  created
+                type: boolean
+            required:
+            - success
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+---
+apiVersion: v1alpha1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-controller-manager
+  namespace: loongcollector-system
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-leader-election-role
+  namespace: loongcollector-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-agentgroup-admin-role
+rules:
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups
+  verbs:
+  - '*'
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-agentgroup-editor-role
+rules:
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-agentgroup-viewer-role
+rules:
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - infraflow.co.infraflow
+  resources:
+  - agentgroups/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: loongcollector-manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - infraflow.co
+  resources:
+  - agentgroups
+  - pipelines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infraflow.co
+  resources:
+  - agentgroups/finalizers
+  - pipelines/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - infraflow.co
+  resources:
+  - agentgroups/status
+  - pipelines/status
+  verbs:
+  - get
+  - patch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRole
+metadata:
+  name: loongcollector-metrics-auth-role
+  namespace: loongcollector-system
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectaccessreviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRole
+metadata:
+  name: loongcollector-metrics-reader
+  namespace: loongcollector-system
+rules:
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-pipeline-admin-role
+  namespace: loongcollector-system
+rules:
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines
+  verbs:
+  - '*'
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-pipeline-editor-role
+  namespace: loongcollector-system
+rules:
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-pipeline-viewer-role
+  namespace: loongcollector-system
+rules:
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - infraflow.co
+  resources:
+  - pipelines/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-leader-election-rolebinding
+  namespace: loongcollector-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: loongcollector-leader-election-role
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: system
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+  name: loongcollector-manager-rolebinding
+  namespace: loongcollector-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: loongcollector-manager-role
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: system
+---
+apiVersion: rbac.authorization.k8s.io/v1alpha1
+kind: ClusterRoleBinding
+metadata:
+  name: loongcollector-metrics-auth-rolebinding
+  namespace: loongcollector-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: loongcollector-metrics-auth-role
+subjects:
+- kind: ServiceAccount
+  name: controller-manager
+  namespace: system
+---
+apiVersion: v1alpha1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+    control-plane: controller-manager
+  name: loongcollector-controller-manager-metrics-service
+  namespace: loongcollector-system
+spec:
+  ports:
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    app.kubernetes.io/name: loongcollector-operator
+    control-plane: controller-manager
+---
+apiVersion: apps/v1alpha1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: loongcollector-operator
+    control-plane: controller-manager
+  name: loongcollector-controller-manager
+  namespace: loongcollector-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loongcollector-operator
+      control-plane: controller-manager
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+      labels:
+        app.kubernetes.io/name: loongcollector-operator
+        control-plane: controller-manager
+    spec:
+      containers:
+      - args:
+        - --metrics-bind-address=:8443
+        - --leader-elect
+        - --health-probe-bind-address=:8081
+        command:
+        - /manager
+        image: controller:latest
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        ports: []
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts: []
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: controller-manager
+      terminationGracePeriodSeconds: 10
+      volumes: []
