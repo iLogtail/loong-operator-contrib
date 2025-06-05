@@ -30,19 +30,19 @@ LoongCollector Operator 用于管理和交付具有 Config-Server 集成的 Loon
 
 - 安装 Operator
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/dist/install.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/dist/install.yaml
 ```
 
 - 部署 Config-Server（可选）：
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
 ```
 
 - 部署 LoongCollector（可选）：
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/loongcollector.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/loongcollector.yaml
 ```
 
 ## 使用
@@ -58,8 +58,6 @@ metadata:
 spec:
   name: sample-pipeline
   content: |
-    tags:
-      - default
     inputs:
       - type: file
         path: /var/log/containers/*.log
@@ -69,19 +67,20 @@ spec:
           - message
     outputs:
       - type: stdout
+  agentGroup: example-group
 EOF
 
 kubectl apply -f pipeline.yaml
 ```
 或者使用以下命令：
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
 ```
 
 - 创建 AgentGroup
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/agentgroup.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_agentgroup.yaml.yaml
 ```
 
 ### 配置说明
