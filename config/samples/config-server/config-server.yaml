@@ -5,7 +5,7 @@ items:
   - apiVersion: v1
     kind: Namespace
     metadata:
-      name: config-server
+      name: loongcollector
 
   - apiVersion: v1
     kind: ConfigMap

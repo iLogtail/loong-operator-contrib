@@ -37,13 +37,13 @@ kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/di
 - Deploy Config-Server (Optional):
 
 ```bash
-kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/config-server/config-server.yaml
 ```
 
 - Deploy LoongCollector (Optional):
 
 ```bash
-kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_agentgroup.yaml.yaml
+kubectl apply -f  https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/loongcollector.yaml
 ```
 
 ## Usage

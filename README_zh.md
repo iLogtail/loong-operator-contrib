@@ -36,13 +36,13 @@ kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/di
 - 部署 Config-Server（可选）：
 
 ```bash
-kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/config-server/config-server.yaml
 ```
 
 - 部署 LoongCollector（可选）：
 
 ```bash
-kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/loongcollector.yaml
+kubectl apply -f  https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/loongcollector.yaml
 ```
 
 ## 使用
