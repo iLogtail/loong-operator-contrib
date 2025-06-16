@@ -6,7 +6,7 @@ items:
     kind: DaemonSet
     metadata:
       name: loongcollector-agent
-      namespace: loongcollector-system
+      namespace: loongcollector
       labels:
         k8s-app: loongcollector-agent
     spec:

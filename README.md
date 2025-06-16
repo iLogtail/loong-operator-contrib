@@ -31,19 +31,19 @@ Kubernetes Operator for LoongCollector is used to manage and deliver LoongCollec
 
 - Install Operator
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/dist/install.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/dist/install.yaml
 ```
 
 - Deploy Config-Server (Optional):
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/config-server/config-server.yaml
 ```
 
 - Deploy LoongCollector (Optional):
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/loongcollector.yaml
+kubectl apply -f  https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/loongcollector.yaml
 ```
 
 ## Usage
@@ -59,8 +59,6 @@ metadata:
 spec:
   name: sample-pipeline
   content: |
-    tags:
-      - default
     inputs:
       - type: file
         path: /var/log/containers/*.log
@@ -70,19 +68,20 @@ spec:
           - message
     outputs:
       - type: stdout
+  agentGroup: example-group
 EOF
 
 kubectl apply -f pipeline.yaml
 ```
 Or use the following command:
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/infraflow_v1alpha1_pipeline.yaml
 ```
 
 - Create AgentGroup
 
 ```bash
-kubectl apply -f https://github.com/infraflows/loongcollector-operator/blob/main/config/samples/agentgroup.yaml
+kubectl apply -f https://github.com/iLogtail/loong-operator-contrib/blob/main/config/samples/agentgroup.yaml
 ```
 
 ### Configuration Description
